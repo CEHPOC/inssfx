@@ -71,8 +71,9 @@ fi
 arg[0]=find
 arg[1]=$dir
 arg[2]="-name"
-arg[3]=${mask[0]}
+arg[3]=${masks[0]}
 i=3
+j=0
 for mask in "$masks"
 do
 i=$(($i+1))
@@ -80,21 +81,28 @@ arg[$i]="-o"
 i=$(($i+1))
 arg[$i]="-name"
 i=$(($i+1))
-arg[$i]=$mask
+j=$(($j+1))
+arg[$i]=${masks[j]}
 done
 "${arg[@]}" | while read file
     do
-	filename="${file%.*}"
-	ext="${file#$filename}"
+	file1=${file##*/}
+	file2=${file%$file1}
+	filename="${file1%.*}"
+	ext="${file1#$filename}"
 	if [[ $fd = 1 ]]
 	then
-		echo "$file -> $filename$sfx$ext"
+		echo "$file -> $file2$filename$sfx$ext"
 	elif [[ $fv = 1 ]]
 	then
-		echo "$file -> $filename$sfx$ext"
-		mv $file $filename$sfx$ext
+		echo "$file -> $fil2$filename$sfx$ext"
+		mv $file $file2$filename$sfx$ext
 	else
-		mv $file $filename$sfx$ext
+		mv $file $file2$filename$sfx$ext
+	fi
+	if ! [[ $? = 0 ]]
+	then
+	echo "не удалось переименовать файл $file"  >&2
 	fi
     done
 
